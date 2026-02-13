@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrandCraft | AI Branding Suite</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-glows">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="logo">
+            <i class="fa-solid fa-cube"></i> BrandCraft <span class="beta">AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="#home" class="active" onclick="showSection('home')">Home</a>
+            <a href="#generate" onclick="showSection('generate')">Workbench</a>
+            <button id="settings-btn" onclick="toggleSettings()"><i class="fa-solid fa-gear"></i></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="active-section fade-in">
+            <div class="hero">
+                <h1>Forge Your Brand Identity with <span class="gradient-text">Generative AI</span></h1>
+                <p>Instantly generate names, logos, and content strategies. Designed for startups and creators.</p>
+                <button class="cta-btn" onclick="showSection('generate')">Start Building <i
+                        class="fa-solid fa-arrow-right"></i></button>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-fingerprint"></i>
+                        <h3>Brand Identity</h3>
+                        <p>Unique names & slogans generated in seconds.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <h3>Content Strategy</h3>
+                        <p>AI-written copy & sentiment analysis.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-image"></i>
+                        <h3>Visual Assets</h3>
+                        <p>Stunning logos created by DALL-E.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generator Workbench -->
+        <section id="generate" class="hidden-section">
+            <div class="workbench-container">
+                <!-- Sidebar -->
+                <div class="glass-sidebar">
+                    <button class="tool-btn active" onclick="switchTool('name-gen')"><i class="fa-solid fa-tag"></i>
+                        Name Generator</button>
+                    <button class="tool-btn" onclick="switchTool('logo-gen')"><i class="fa-solid fa-paintbrush"></i>
+                        Logo Creator</button>
+                    <button class="tool-btn" onclick="switchTool('content-gen')"><i class="fa-solid fa-align-left"></i>
+                        Content & Sentiment</button>
+                    <button class="tool-btn" onclick="switchTool('assistant')"><i class="fa-solid fa-robot"></i> Brand
+                        Assistant</button>
+                </div>
+
+                <!-- Tool Panel -->
+                <div class="glass-panel">
+
+                    <!-- 1. Name Generator -->
+                    <div id="name-gen" class="tool-view active-tool">
+                        <h2><i class="fa-solid fa-tag"></i> Brand Name Generator</h2>
+                        <p class="tool-desc">Describe your business, and we'll generate catchy names and slogans.</p>
+
+                        <div class="input-group">
+                            <label>Business Description / Keywords</label>
+                            <textarea id="name-prompt"
+                                placeholder="e.g., A sustainable coffee shop for tech nomads..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Style</label>
+                            <select id="name-style">
+                                <option value="Modern">Modern & Minimalist</option>
+                                <option value="Playful">Playful & Fun</option>
+                                <option value="Luxury">Luxury & Premium</option>
+                                <option value="Tech">Tech & Futuristic</option>
+                            </select>
+                        </div>
+                        <button class="action-btn" onclick="generateBrandName()">Generate Names</button>
+
+                        <div id="name-results" class="results-area hidden">
+                            <!-- Results injected here -->
+                        </div>
+                    </div>
+
+                    <!-- 2. Logo Generator -->
+                    <div id="logo-gen" class="tool-view hidden-tool">
+                        <h2><i class="fa-solid fa-paintbrush"></i> Logo Creator</h2>
+                        <p class="tool-desc">Describe your vision, and AI will render a logo concept.</p>
+
+                        <div class="input-group">
+                            <label>Visual Description</label>
+                            <textarea id="logo-prompt"
+                                placeholder="e.g., A golden phoenix style logo, vector art, minimalist..."></textarea>
+                        </div>
+                        <button class="action-btn" onclick="generateLogo()">Generate Logo</button>
+
+                        <div id="logo-results" class="results-area hidden">
+                            <div class="loader hidden" id="logo-loader"></div>
+                            <img id="generated-logo" src="" alt="Generated Logo">
+                        </div>
+                    </div>
+
+                    <!-- 3. Content & Sentiment -->
+                    <div id="content-gen" class="tool-view hidden-tool">
+                        <h2><i class="fa-solid fa-align-left"></i> Content & Sentiment</h2>
+                        <p class="tool-desc">Generate marketing copy or analyze your brand voice.</p>
+
+                        <div class="tabs-sub">
+                            <button class="sub-tab active" onclick="subTab('copy')">Write Copy</button>
+                            <button class="sub-tab" onclick="subTab('analyze')">Sentiment Analysis</button>
+                        </div>
+
+                        <div id="view-copy" class="sub-view">
+                            <div class="input-group">
+                                <label>Topic / Product</label>
+                                <input type="text" id="copy-topic"
+                                    placeholder="e.g., Launch post for a new energy drink">
+                            </div>
+                            <button class="action-btn" onclick="generateCopy()">Write Content</button>
+                            <div id="copy-results" class="results-area text-result hidden"></div>
+                        </div>
+
+                        <div id="view-analyze" class="sub-view hidden">
+                            <div class="input-group">
+                                <label>Paste Text to Analyze</label>
+                                <textarea id="sentiment-text"
+                                    placeholder="Paste a customer review or brand bio..."></textarea>
+                            </div>
+                            <button class="action-btn" onclick="analyzeSentiment()">Analyze Tone</button>
+                            <div id="sentiment-results" class="results-area hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Assistant -->
+                    <div id="assistant" class="tool-view hidden-tool">
+                        <h2><i class="fa-solid fa-robot"></i> Brand Assistant</h2>
+                        <div class="chat-container">
+                            <div id="chat-history" class="chat-history">
+                                <div class="msg ai">Hello! I'm your Brand Assistant. How can I help you today?</div>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" id="chat-input" placeholder="Ask about branding strategy...">
+                                <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content glass-card">
+            <h3>Settings</h3>
+            <div class="input-group">
+                <label>OpenAI/Groq API Key</label>
+                <input type="password" id="api-key-input" placeholder="sk-... or gsk_...">
+            </div>
+            <div class="input-group">
+                <label>Pexels API Key (for Images)</label>
+                <input type="password" id="pexels-key-input" placeholder="Paste Pexels Key Here...">
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" onclick="toggleSettings()">Cancel</button>
+                <button class="action-btn" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="toast" class="toast hidden">Action Successful</div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
