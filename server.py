@@ -10,6 +10,9 @@ from PIL import Image
 import requests
 import json
 import time
+import os
+from huggingface_hub import InferenceClient
+
 
 # --- App Setup ---
 app = FastAPI()
@@ -55,20 +58,18 @@ async def generate_image(req: ImageRequest):
         }
         
         # Use Stable Diffusion via Replicate
-        # Version: https://replicate.com/stability-ai/stable-diffusion
+        # Using the correct Stable Diffusion v1.5 version
         print("Creating image generation request on Replicate...")
         
         create_response = requests.post(
             "https://api.replicate.com/v1/predictions",
             headers=headers,
             json={
-                "version": "db21e45d3f7023abc9f30f5358e4b0be2a8ae493a8122d422cc680dd0f532302",
+                "version": "a9758cbfda57c3860a3a86acc677f7616ff1cea0ff7dc5acf92b7be373a36cd4",
                 "input": {
                     "prompt": enhanced_prompt,
-                    "width": 512,
-                    "height": 512,
                     "num_outputs": 1,
-                    "num_inference_steps": 25,
+                    "num_inference_steps": 50,
                     "guidance_scale": 7.5,
                 }
             },
@@ -147,3 +148,15 @@ app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+client = InferenceClient(
+    provider="nscale",
+    api_key=os.environ["HF_TOKEN"],
+)
+
+# output is a PIL.Image object
+image = client.text_to_image(
+    "Astronaut riding a horse",
+    model="stabilityai/stable-diffusion-xl-base-1.0",
+)
