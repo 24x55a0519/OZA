@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-replicate
-requests
+huggingface-hub
+pillow
 python-dotenv

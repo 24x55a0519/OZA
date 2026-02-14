@@ -3,16 +3,16 @@
 // --- Configuration ---
 const CONFIG = {
     apiKey: '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', // Set by user in settings
-    replicateKey: '', // Replicate API key for logo generation
+    hfToken: '', // Hugging Face token for logo generation
     pexelsKey: '', // Pexels Key
     mockMode: false,
     models: {
         text: 'llama-3.3-70b-versatile', // Updated Groq Model
-        image: 'black-forest-labs/flux-schnell' // Replicate Flux model
+        image: 'black-forest-labs/FLUX.1-Krea-dev' // Hugging Face FLUX model
     },
     endpoints: {
         text: 'https://api.groq.com/openai/v1/chat/completions',
-        image: '/api/generate-image', // Local Backend (uses Replicate token from env)
+        image: '/api/generate-image', // Local Backend (uses HF_TOKEN from env)
         pexels: 'https://api.pexels.com/v1/search'
     }
 };
@@ -83,7 +83,7 @@ function toggleSettings() {
     if (modal.classList.contains('hidden')) {
         modal.classList.remove('hidden');
         document.getElementById('api-key-input').value = CONFIG.apiKey;
-        document.getElementById('replicate-key-input').value = CONFIG.replicateKey;
+        document.getElementById('hf-token-input').value = CONFIG.hfToken;
         document.getElementById('pexels-key-input').value = CONFIG.pexelsKey;
     } else {
         modal.classList.add('hidden');
@@ -92,7 +92,7 @@ function toggleSettings() {
 
 function saveSettings() {
     const key = document.getElementById('api-key-input').value;
-    const replicateKey = document.getElementById('replicate-key-input').value;
+    const hfToken = document.getElementById('hf-token-input').value;
     const pexelsKey = document.getElementById('pexels-key-input').value;
     
     if (key.trim().length > 0) {
@@ -104,11 +104,11 @@ function saveSettings() {
         showToast('No Groq Key entered. Reverting to Mock Mode.');
     }
     
-    if (replicateKey.trim().length > 0) {
-        CONFIG.replicateKey = replicateKey.trim();
-        showToast('✅ Replicate Token Saved. Logo generation ready!');
+    if (hfToken.trim().length > 0) {
+        CONFIG.hfToken = hfToken.trim();
+        showToast('✅ Hugging Face Token Saved. Logo generation ready!');
     } else {
-        showToast('⚠️ No Replicate key. Logo generation will use mock data.');
+        showToast('⚠️ No HF token. Logo generation will use mock data.');
     }
     
     if (pexelsKey.trim().length > 0) {
@@ -225,8 +225,8 @@ async function generateLogo() {
     try {
         let imageUrl = '';
 
-        // Use Replicate API via local backend
-        if (CONFIG.replicateKey) {
+        // Use Hugging Face API via local backend
+        if (CONFIG.hfToken) {
             loadingText.innerText = "🎨 Generating logo using AI (this may take 30-60 seconds)...";
             const response = await fetch(CONFIG.endpoints.image, {
                 method: 'POST',
@@ -236,7 +236,7 @@ async function generateLogo() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.detail || "Generation failed. Check if REPLICATE_API_TOKEN is set on server.");
+                throw new Error(errorData.detail || "Generation failed. Check if HF_TOKEN is set on server.");
             }
 
             const data = await response.json();
@@ -247,7 +247,7 @@ async function generateLogo() {
             loadingText.innerText = "📸 Loading demo logo...";
             await new Promise(r => setTimeout(r, 1500));
             imageUrl = MOCK_DATA.logos[Math.floor(Math.random() * MOCK_DATA.logos.length)];
-            showToast("⚠️ Using demo logo. Add Replicate token in settings for real generation.");
+            showToast("⚠️ Using demo logo. Add Hugging Face token in settings for real generation.");
         }
 
         // Load image
@@ -270,7 +270,7 @@ async function generateLogo() {
         loadingText.classList.add('hidden');
         logoDisplay.classList.add('hidden');
         logoError.classList.remove('hidden');
-        logoError.innerHTML = `<strong>❌ Generation Failed:</strong><br>${e.message}<br><br><small>Make sure you have set REPLICATE_API_TOKEN in your server environment and added the token in settings.</small>`;
+        logoError.innerHTML = `<strong>❌ Generation Failed:</strong><br>${e.message}<br><br><small>Make sure you have set HF_TOKEN in your server environment and added the token in settings.</small>`;
         showToast('Generation failed. Check console and settings.');
     }
 }
