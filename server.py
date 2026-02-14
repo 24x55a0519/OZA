@@ -7,6 +7,7 @@ import uvicorn
 import base64
 from io import BytesIO
 import requests
+import replicate
 
 # --- App Setup ---
 app = FastAPI()
@@ -39,9 +40,7 @@ async def generate_image(req: ImageRequest):
     try:
         print(f"🎨 Generating logo: {req.prompt}")
         
-        # Call Replicate API
-        import replicate
-        
+        # Call Replicate API using Flux model
         output = replicate.run(
             "black-forest-labs/flux-schnell",
             input={
