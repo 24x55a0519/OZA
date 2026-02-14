@@ -204,21 +204,28 @@ async function generateBrandName() {
 async function generateLogo() {
     const prompt = document.getElementById('logo-prompt').value;
     const imgEl = document.getElementById('generated-logo');
-    const container = document.getElementById('logo-results');
+    const resultsContainer = document.getElementById('logo-results');
     const loader = document.getElementById('logo-loader');
+    const loadingText = document.getElementById('logo-loading-text');
+    const logoDisplay = document.getElementById('logo-display');
+    const logoError = document.getElementById('logo-error');
 
     if (!prompt) { showToast('Describe your logo first'); return; }
 
-    container.classList.remove('hidden');
+    // Show results container
+    resultsContainer.classList.remove('hidden');
+    
+    // Show loader and loading text, hide others
     loader.classList.remove('hidden');
-    imgEl.style.display = 'none';
+    loadingText.classList.remove('hidden');
+    logoDisplay.classList.add('hidden');
+    logoError.classList.add('hidden');
 
     try {
         let imageUrl = '';
 
         // Use Hugging Face GLM-Image model via local backend
-        if (CONFIG.hfToken || !CONFIG.mockMode) {
-            showToast("🎨 Generating with Hugging Face GLM-Image...");
+        if (!CONFIG.mockMode) {
             const response = await fetch(CONFIG.endpoints.image, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -235,24 +242,45 @@ async function generateLogo() {
             imageUrl = data.url; // Base64 data URL
         } else {
             // Fallback to mock
-            showToast("No HF Token. Showing Demo Logo.");
             await new Promise(r => setTimeout(r, 2000));
             imageUrl = MOCK_DATA.logos[Math.floor(Math.random() * MOCK_DATA.logos.length)];
         }
 
+        // Load image
         imgEl.src = imageUrl;
         imgEl.onload = () => {
             loader.classList.add('hidden');
-            imgEl.style.display = 'block';
+            loadingText.classList.add('hidden');
+            logoDisplay.classList.remove('hidden');
+            logoError.classList.add('hidden');
             showToast('✅ Logo generated successfully!');
+        };
+
+        imgEl.onerror = () => {
+            throw new Error('Failed to load generated image');
         };
 
     } catch (e) {
         console.error(e);
         loader.classList.add('hidden');
-        container.innerHTML = `<p style="color:red">❌ Generation Failed: ${e.message}</p>`;
+        loadingText.classList.add('hidden');
+        logoDisplay.classList.add('hidden');
+        logoError.classList.remove('hidden');
+        logoError.innerHTML = `<strong>❌ Generation Failed:</strong><br>${e.message}`;
         showToast('Generation failed. Check console.');
     }
+}
+
+// Download logo function
+function downloadLogo() {
+    const img = document.getElementById('generated-logo');
+    if (!img.src) return;
+    
+    const link = document.createElement('a');
+    link.href = img.src;
+    link.download = 'logo.png';
+    link.click();
+    showToast('✅ Logo downloaded!');
 }
 
 async function generateCopy() {

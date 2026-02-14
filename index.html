@@ -120,9 +120,18 @@
                         </div>
                         <button class="action-btn" onclick="generateLogo()">Generate Logo</button>
 
-                        <div id="logo-results" class="results-area hidden">
-                            <div class="loader hidden" id="logo-loader"></div>
-                            <img id="generated-logo" src="" alt="Generated Logo">
+                        <div id="logo-results" class="logo-results-area hidden">
+                            <div class="logo-loading">
+                                <div class="loader hidden" id="logo-loader"></div>
+                                <p id="logo-loading-text" class="loading-text hidden">Generating your logo...</p>
+                            </div>
+                            <div id="logo-display" class="logo-display hidden">
+                                <img id="generated-logo" src="" alt="Generated Logo">
+                                <button class="download-btn" onclick="downloadLogo()">
+                                    <i class="fa-solid fa-download"></i> Download Logo
+                                </button>
+                            </div>
+                            <div id="logo-error" class="logo-error hidden"></div>
                         </div>
                     </div>
 
@@ -201,6 +210,42 @@
 
     <!-- Notification -->
     <div id="toast" class="toast hidden">Action Successful</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fa-solid fa-cube"></i> BrandCraft</h4>
+                <p>Generative AI-Powered Branding Automation System</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home" onclick="showSection('home')">Home</a></li>
+                    <li><a href="#generate" onclick="showSection('generate')">Workbench</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Technologies</h4>
+                <ul>
+                    <li>Groq (Llama 3)</li>
+                    <li>Hugging Face GLM-Image</li>
+                    <li>FastAPI</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 BrandCraft. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script src="app.js"></script>
 </body>
