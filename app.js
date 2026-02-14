@@ -3,15 +3,16 @@
 // --- Configuration ---
 const CONFIG = {
     apiKey: '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', // Set by user in settings
-    pexelsKey: '', // New Pexels Key
+    hfToken: '', // Hugging Face token for logo generation
+    pexelsKey: '', // Pexels Key
     mockMode: false,
     models: {
         text: 'llama-3.3-70b-versatile', // Updated Groq Model
-        image: 'dall-e-3' // Not supported on Groq
+        image: 'zai-org/GLM-Image' // Hugging Face GLM-Image
     },
     endpoints: {
         text: 'https://api.groq.com/openai/v1/chat/completions',
-        image: '/api/generate-image', // Local SDXL Backend
+        image: '/api/generate-image', // Local Backend (uses HF token from env)
         pexels: 'https://api.pexels.com/v1/search'
     }
 };
@@ -82,6 +83,8 @@ function toggleSettings() {
     if (modal.classList.contains('hidden')) {
         modal.classList.remove('hidden');
         document.getElementById('api-key-input').value = CONFIG.apiKey;
+        document.getElementById('hf-token-input').value = CONFIG.hfToken;
+        document.getElementById('pexels-key-input').value = CONFIG.pexelsKey;
     } else {
         modal.classList.add('hidden');
     }
@@ -89,15 +92,29 @@ function toggleSettings() {
 
 function saveSettings() {
     const key = document.getElementById('api-key-input').value;
+    const hfToken = document.getElementById('hf-token-input').value;
+    const pexelsKey = document.getElementById('pexels-key-input').value;
+    
     if (key.trim().length > 0) {
         CONFIG.apiKey = key.trim();
         CONFIG.mockMode = false;
-        showToast('API Key Saved. Live Mode Active.');
+        showToast('API Key Saved.');
     } else {
         CONFIG.mockMode = true;
-        showToast('No Key entered. Reverting to Mock Mode.');
+        showToast('No Groq Key entered. Reverting to Mock Mode.');
     }
+    
+    if (hfToken.trim().length > 0) {
+        CONFIG.hfToken = hfToken.trim();
+        showToast('Hugging Face Token Saved. Logo generation ready!');
+    }
+    
+    if (pexelsKey.trim().length > 0) {
+        CONFIG.pexelsKey = pexelsKey.trim();
+    }
+    
     toggleSettings();
+}
 }
 
 function showToast(msg) {
@@ -199,26 +216,9 @@ async function generateLogo() {
     try {
         let imageUrl = '';
 
-        // Use Pexels if key is present, otherwise fallback to mock/dall-E check
-        if (CONFIG.pexelsKey) {
-            const response = await fetch(`${CONFIG.endpoints.pexels}?query=${encodeURIComponent(prompt)}&per_page=1`, {
-                headers: {
-                    'Authorization': CONFIG.pexelsKey
-                }
-            });
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-            if (!data.photos || data.photos.length === 0) throw new Error("No images found on Pexels.");
-
-            imageUrl = data.photos[0].src.large2x; // High res
-
-        } else if (CONFIG.mockMode || CONFIG.apiKey.startsWith('gsk_')) {
-            if (CONFIG.apiKey.startsWith('gsk_')) showToast("No Pexels Key. Showing Demo Logo.");
-            await new Promise(r => setTimeout(r, 2000));
-            imageUrl = MOCK_DATA.logos[Math.floor(Math.random() * MOCK_DATA.logos.length)];
-        } else {
-            // Use Local Stable Diffusion Backend
-            showToast("Generating with Local SDXL... (May take time)");
+        // Use Hugging Face GLM-Image model via local backend
+        if (CONFIG.hfToken || !CONFIG.mockMode) {
+            showToast("🎨 Generating with Hugging Face GLM-Image...");
             const response = await fetch(CONFIG.endpoints.image, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -226,26 +226,32 @@ async function generateLogo() {
             });
 
             if (!response.ok) {
-                // Fallback to mock if server not running or error
-                throw new Error("Local Generation Failed. Is server.py running?");
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Generation failed. Ensure HF_TOKEN is set on server.");
             }
 
             const data = await response.json();
             if (data.detail) throw new Error(data.detail);
-
             imageUrl = data.url; // Base64 data URL
+        } else {
+            // Fallback to mock
+            showToast("No HF Token. Showing Demo Logo.");
+            await new Promise(r => setTimeout(r, 2000));
+            imageUrl = MOCK_DATA.logos[Math.floor(Math.random() * MOCK_DATA.logos.length)];
         }
 
         imgEl.src = imageUrl;
         imgEl.onload = () => {
             loader.classList.add('hidden');
             imgEl.style.display = 'block';
+            showToast('✅ Logo generated successfully!');
         };
 
     } catch (e) {
         console.error(e);
         loader.classList.add('hidden');
-        container.innerHTML += `<p style="color:red">Generation Failed. Check Console.</p>`;
+        container.innerHTML = `<p style="color:red">❌ Generation Failed: ${e.message}</p>`;
+        showToast('Generation failed. Check console.');
     }
 }
 

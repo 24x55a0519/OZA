@@ -181,11 +181,15 @@
         <div class="modal-content glass-card">
             <h3>Settings</h3>
             <div class="input-group">
-                <label>OpenAI/Groq API Key</label>
-                <input type="password" id="api-key-input" placeholder="sk-... or gsk_...">
+                <label>Groq API Key (for Text Generation)</label>
+                <input type="password" id="api-key-input" placeholder="gsk_...">
             </div>
             <div class="input-group">
-                <label>Pexels API Key (for Images)</label>
+                <label>Hugging Face Token (for Logo Generation)</label>
+                <input type="password" id="hf-token-input" placeholder="hf_...">
+            </div>
+            <div class="input-group">
+                <label>Pexels API Key (for Stock Images)</label>
                 <input type="password" id="pexels-key-input" placeholder="Paste Pexels Key Here...">
             </div>
             <div class="modal-actions">

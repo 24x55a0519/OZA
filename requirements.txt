@@ -1,8 +1,5 @@
 fastapi
 uvicorn
-torch
-diffusers
-transformers
-accelerate
-invisible_watermark
-safetensors
+huggingface-hub
+pillow
+python-dotenv
