@@ -194,8 +194,8 @@
                 <input type="password" id="api-key-input" placeholder="gsk_...">
             </div>
             <div class="input-group">
-                <label>Hugging Face Token (for Logo Generation)</label>
-                <input type="password" id="hf-token-input" placeholder="hf_...">
+                <label>Replicate API Token (for Logo Generation)</label>
+                <input type="password" id="replicate-key-input" placeholder="Get free at replicate.com">
             </div>
             <div class="input-group">
                 <label>Pexels API Key (for Stock Images)</label>
@@ -213,37 +213,62 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4><i class="fa-solid fa-cube"></i> BrandCraft</h4>
-                <p>Generative AI-Powered Branding Automation System</p>
-            </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="#home" onclick="showSection('home')">Home</a></li>
-                    <li><a href="#generate" onclick="showSection('generate')">Workbench</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Technologies</h4>
-                <ul>
-                    <li>Groq (Llama 3)</li>
-                    <li>Hugging Face GLM-Image</li>
-                    <li>FastAPI</li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Connect</h4>
-                <div class="social-links">
-                    <a href="#" title="GitHub"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        <div class="footer-wrapper">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <i class="fa-solid fa-cube"></i>
+                        <h4>BrandCraft AI</h4>
+                    </div>
+                    <p>Generative AI-Powered Branding Automation System</p>
+                    <p class="footer-tagline">Create stunning brand identities in seconds</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4><i class="fa-solid fa-link"></i> Quick Links</h4>
+                    <ul>
+                        <li><a href="#home" onclick="showSection('home')"><i class="fa-solid fa-home"></i> Home</a></li>
+                        <li><a href="#generate" onclick="showSection('generate')"><i class="fa-solid fa-wand-magic-sparkles"></i> Workbench</a></li>
+                        <li><a href="#" onclick="toggleSettings(); return false;"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4><i class="fa-solid fa-brain"></i> AI Technologies</h4>
+                    <ul>
+                        <li><span><i class="fa-solid fa-sparkles"></i> Groq Llama 3</span></li>
+                        <li><span><i class="fa-solid fa-image"></i> Replicate Flux</span></li>
+                        <li><span><i class="fa-solid fa-photo-film"></i> Pexels API</span></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4><i class="fa-solid fa-handshake"></i> Connect</h4>
+                    <div class="social-links">
+                        <a href="https://github.com" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://twitter.com" target="_blank" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="mailto:support@brandcraft.ai" title="Email"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4><i class="fa-solid fa-info-circle"></i> Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Docs</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
                 </div>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 BrandCraft. All rights reserved.</p>
+
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 BrandCraft. All rights reserved. | Built with <i class="fa-solid fa-heart" style="color: #ff4444;"></i> AI & Creativity</p>
+                    <p class="footer-version">Version 2.0 | <a href="#">GitHub</a> | <a href="#">Report Issues</a></p>
+                </div>
+            </div>
         </div>
     </footer>
 
