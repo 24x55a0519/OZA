@@ -225,30 +225,23 @@ async function generateLogo() {
     try {
         let imageUrl = '';
 
-        // Use Hugging Face API via local backend
-        if (CONFIG.hfToken) {
-            loadingText.innerText = "🎨 Generating logo using AI (this may take 30-60 seconds)...";
-            const response = await fetch(CONFIG.endpoints.image, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
-            });
+        // Always try API first (works with or without HF_TOKEN)
+        loadingText.innerText = "🎨 Generating logo using AI (this may take 30-60 seconds)...";
+        
+        const response = await fetch(CONFIG.endpoints.image, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+        });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Generation failed. Check if HF_TOKEN is set on server.");
-            }
-
-            const data = await response.json();
-            if (data.detail) throw new Error(data.detail);
-            imageUrl = data.url; // Base64 data URL
-        } else {
-            // Fallback to mock with demo logos
-            loadingText.innerText = "📸 Loading demo logo...";
-            await new Promise(r => setTimeout(r, 1500));
-            imageUrl = MOCK_DATA.logos[Math.floor(Math.random() * MOCK_DATA.logos.length)];
-            showToast("⚠️ Using demo logo. Add Hugging Face token in settings for real generation.");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Generation failed. Check server status.");
         }
+
+        const data = await response.json();
+        if (data.detail) throw new Error(data.detail);
+        imageUrl = data.url; // Base64 data URL
 
         // Load image
         imgEl.src = imageUrl;
@@ -265,13 +258,13 @@ async function generateLogo() {
         };
 
     } catch (e) {
-        console.error(e);
+        console.error('Logo generation error:', e);
         loader.classList.add('hidden');
         loadingText.classList.add('hidden');
         logoDisplay.classList.add('hidden');
         logoError.classList.remove('hidden');
-        logoError.innerHTML = `<strong>❌ Generation Failed:</strong><br>${e.message}<br><br><small>Make sure you have set HF_TOKEN in your server environment and added the token in settings.</small>`;
-        showToast('Generation failed. Check console and settings.');
+        logoError.innerHTML = `<strong>❌ Generation Failed:</strong><br>${e.message}<br><br><small>Make sure the server is running. Check console for more details.</small>`;
+        showToast('Generation failed. Check console.');
     }
 }
 

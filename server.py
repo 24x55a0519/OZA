@@ -8,22 +8,25 @@ import uvicorn
 import base64
 from io import BytesIO
 from PIL import Image
+import requests
+import json
 
 # --- App Setup ---
 app = FastAPI()
 
 # --- Hugging Face InferenceClient Setup ---
 hf_token = os.getenv("HF_TOKEN")
-if not hf_token:
-    print("⚠️  HF_TOKEN not set. Logo generation will use mock data.")
-    print("Get your token at: https://huggingface.co/settings/tokens")
-    client = None
-else:
+print(f"HF_TOKEN Status: {'Set' if hf_token else 'Not Set'}")
+
+if hf_token:
     print("✅ Hugging Face InferenceClient initialized with FAL-AI provider")
     client = InferenceClient(
         provider="fal-ai",
         api_key=hf_token,
     )
+else:
+    print("⚠️  HF_TOKEN not set. Using free Hugging Face Inference API")
+    client = InferenceClient()  # Uses default free API
 
 # --- API Request Model ---
 class ImageRequest(BaseModel):
@@ -33,33 +36,50 @@ class ImageRequest(BaseModel):
 
 @app.post("/api/generate-image")
 async def generate_image(req: ImageRequest):
-    """Generate an image using Hugging Face InferenceClient with FAL-AI provider and FLUX.1-Krea-dev model"""
-    
-    if client is None:
-        raise HTTPException(
-            status_code=500, 
-            detail="HF_TOKEN not set. Get your token at https://huggingface.co/settings/tokens"
-        )
+    """Generate an image using Hugging Face InferenceClient"""
     
     try:
         print(f"🎨 Generating logo: {req.prompt}")
         
-        # Call Hugging Face API with FAL-AI provider using FLUX.1-Krea-dev model
-        image = client.text_to_image(
-            req.prompt,
-            model="black-forest-labs/FLUX.1-Krea-dev",
-        )
+        # Enhance the prompt for better results
+        enhanced_prompt = f"{req.prompt}, high quality, professional, logo design, vector art, clean"
         
-        # image is a PIL.Image object, convert to base64
-        buffered = BytesIO()
-        image.save(buffered, format="PNG")
-        img_data = buffered.getvalue()
+        # Try with FLUX model first (if token is available)
+        if hf_token:
+            try:
+                print("Trying FLUX.1-Krea-dev model...")
+                image = client.text_to_image(
+                    enhanced_prompt,
+                    model="black-forest-labs/FLUX.1-Krea-dev",
+                )
+                print("✅ FLUX model succeeded")
+            except Exception as e:
+                print(f"FLUX model failed: {e}, trying Stable Diffusion...")
+                # Fallback to Stable Diffusion
+                image = client.text_to_image(enhanced_prompt)
+        else:
+            # Use free inference API with a reliable model
+            print("Using free Hugging Face Inference API...")
+            image = client.text_to_image(
+                enhanced_prompt,
+                model="stabilityai/stable-diffusion-2-1"
+            )
+        
+        # Convert image to base64
+        if isinstance(image, bytes):
+            img_data = image
+        else:
+            # If it's a PIL Image
+            buffered = BytesIO()
+            image.save(buffered, format="PNG")
+            img_data = buffered.getvalue()
+        
         img_str = base64.b64encode(img_data).decode("utf-8")
-        
         return {"url": f"data:image/png;base64,{img_str}"}
             
     except Exception as e:
         print(f"Error during generation: {e}")
+        print(f"Error type: {type(e).__name__}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- Static Files (Serve Frontend) ---

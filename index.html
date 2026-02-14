@@ -194,8 +194,9 @@
                 <input type="password" id="api-key-input" placeholder="gsk_...">
             </div>
             <div class="input-group">
-                <label>Hugging Face Token (for Logo Generation)</label>
-                <input type="password" id="hf-token-input" placeholder="Get at huggingface.co/settings/tokens">
+                <label>Hugging Face Token (Optional - for enhanced logo generation)</label>
+                <input type=\"password\" id=\"hf-token-input\" placeholder=\"hf_... (optional, uses free API if empty)\">
+                <small style=\"color: var(--text-muted); margin-top: 0.5rem;\">Leave empty to use free Hugging Face Inference API. Add token for priority access and better models.</small>
             </div>
             <div class="input-group">
                 <label>Pexels API Key (for Stock Images)</label>
